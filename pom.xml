@@ -1,103 +1,812 @@
-<?xml version="1.0" encoding="UTF-8"?>
+cat > src/main/webapp/index.jsp << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Pipeline Dashboard</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0e1a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    <modelVersion>4.0.0</modelVersion>
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(72, 49, 212, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(236, 72, 153, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+            z-index: 0;
+        }
 
-    <groupId>in.javahome</groupId>
-    <artifactId>myweb</artifactId>
-    <version>8.8.3</version>
-    <packaging>war</packaging>
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
 
-    <name>Java Home myweb</name>
-    <url>https://maven.apache.org</url>
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            animation: float-particle linear infinite;
+        }
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
 
-        <!-- Build old application code using Java 8 compatibility -->
-        <maven.compiler.release>8</maven.compiler.release>
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 50px 45px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            animation: fadeInUp 0.8s ease;
+        }
 
-        <docker.image.prefix>kammana</docker.image.prefix>
-        <sonar.host.url>http://18.181.164.81:9000</sonar.host.url>
-    </properties>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
 
-    <repositories>
-             <repository>
-                    <id>flm-feed</id>
-                    <url>https://pkgs.dev.azure.com/afsanabegummd00/MyFirstProject/_packaging/flm-feed/maven/v1</url>
-                    <releases>
-                      <enabled>true</enabled>
-                      </releases>
-                      <snapshots>
-                               <enabled>true</enabled>
-                      </snapshots>
-              </repository>
-    </repositories>
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
 
-    <distributionManagement>
-            <repository>
-  <id>flm-feed</id>
-  <url>https://pkgs.dev.azure.com/afsanabegummd00/MyFirstProject/_packaging/flm-feed/maven/v1</url>
-  <releases>
-    <enabled>true</enabled>
-  </releases>
-  <snapshots>
-    <enabled>true</enabled>
-  </snapshots>
-</repository>
-        <snapshotRepository>
-            <id>nexusRepo</id>
-            <url>http://34.208.218.12:8081/repository/sample-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+        .logo-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3);
+        }
 
-    <build>
-        <finalName>myweb</finalName>
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
 
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-            </plugin>
+        .header h1 span {
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <release>8</release>
-                </configuration>
-            </plugin>
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 4px;
+        }
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
-            </plugin>
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.4.0</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 100px;
+            color: #34d399;
+            font-size: 13px;
+            font-weight: 500;
+        }
 
-</project>
+        .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .version-badge {
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 20px 22px;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 22px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .stat-card .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .stat-card .stat-change {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 100px;
+            margin-top: 8px;
+        }
+
+        .stat-change.positive {
+            background: rgba(52, 211, 153, 0.12);
+            color: #34d399;
+        }
+
+        .stat-change.negative {
+            background: rgba(251, 113, 133, 0.12);
+            color: #fb7185;
+        }
+
+        /* Main Content */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item .label {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+        }
+
+        .info-item .value {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .info-item .value i {
+            margin-right: 6px;
+        }
+
+        /* Progress bars */
+        .progress-item {
+            margin-bottom: 14px;
+        }
+
+        .progress-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 4px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 1.5s ease;
+        }
+
+        .fill.purple { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+        .fill.green { background: linear-gradient(90deg, #34d399, #6ee7b7); }
+        .fill.blue { background: linear-gradient(90deg, #60a5fa, #93c5fd); }
+        .fill.pink { background: linear-gradient(90deg, #f472b6, #f9a8d4); }
+
+        /* Button Group */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 11px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(52, 211, 153, 0.4);
+        }
+
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 13px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.3);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stat-card .stat-number {
+                font-size: 22px;
+            }
+
+            .btn-group .btn {
+                flex: 1;
+                justify-content: center;
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            .footer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 100px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        /* Toast notification style */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(52, 211, 153, 0.12);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: #34d399;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: slideUp 0.4s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .toast.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particles -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span>Deployment initiated successfully!</span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo-icon">
+                    <i class="fas fa-arrow-trend-up"></i>
+                </div>
+                <div>
+                    <h1>DevOps <span>Pipeline</span></h1>
+                    <div class="header-subtitle">Continuous Integration & Delivery</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-badge">
+                    <span class="dot"></span>
+                    All Systems Operational
+                </div>
+                <div class="version-badge">
+                    <i class="fas fa-tag"></i> v8.8.4
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #818cf8;">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="stat-number">12</div>
+                <div class="stat-label">Active Branches</div>
+                <span class="stat-change positive">+2 this week</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #34d399;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-number">94%</div>
+                <div class="stat-label">Build Success Rate</div>
+                <span class="stat-change positive">↑ 4.2%</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f472b6;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">8</div>
+                <div class="stat-label">Team Members</div>
+                <span class="stat-change positive">Active</span>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #60a5fa;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-number">2.3s</div>
+                <div class="stat-label">Avg Build Time</div>
+                <span class="stat-change positive">↓ 0.7s</span>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Column - System Info -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-server" style="margin-right: 8px;"></i>
+                    System Overview
+                </div>
+                <div class="info-item">
+                    <span class="label"><i class="fas fa-cube"></i> Application</span>
+                    <span class="value">DevOps Dashboard</span>
+                </div>
+                <div class="info-item">
+                    <span class="label"><i class="fas fa-java"></i> Java Version</span>
+                    <span class="value">Amazon Corretto 21</span>
+                </div>
+                <div class="info-item">
+                    <span class="label"><i class="fas fa-tomcat"></i> Server</span>
+                    <span class="value">Apache Tomcat 9.0.121</span>
+                </div>
+                <div class="info-item">
+                    <span class="label"><i class="fab fa-linux"></i> OS</span>
+                    <span class="value">Amazon Linux 2023</span>
+                </div>
+                <div class="info-item">
+                    <span class="label"><i class="fas fa-git-alt"></i> Repository</span>
+                    <span class="value">codeflmm</span>
+                </div>
+                <div class="info-item" style="border-bottom: none; padding-bottom: 0;">
+                    <span class="label"><i class="fas fa-calendar"></i> Deployed</span>
+                    <span class="value" id="deployTime">Just now</span>
+                </div>
+            </div>
+
+            <!-- Right Column - Build Progress -->
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-chart-simple" style="margin-right: 8px;"></i>
+                    Pipeline Status
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>Build</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill purple" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>Tests</span>
+                        <span>87%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill green" style="width: 87%;"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>Deployment</span>
+                        <span>65%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill blue" style="width: 65%;"></div>
+                    </div>
+                </div>
+                <div class="progress-item" style="margin-bottom: 0;">
+                    <div class="progress-header">
+                        <span>Code Coverage</span>
+                        <span>78%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill pink" style="width: 78%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="margin-bottom: 30px;">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="showToast()">
+                    <i class="fas fa-play"></i> Deploy Now
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-chart-line"></i> View Logs
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+                <a href="status.jsp" class="btn btn-success">
+                    <i class="fas fa-heartbeat"></i> System Status
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <i class="fas fa-heart" style="color: #fb7185; margin-right: 4px;"></i>
+                Built with Jenkins, Maven & Tomcat
+            </p>
+            <div class="footer-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-docker"></i></a>
+                <a href="#"><i class="fas fa-envelope"></i></a>
+                <a href="#"><i class="fas fa-question-circle"></i></a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Generate particles
+        (function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.width = (2 + Math.random() * 4) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDuration = (12 + Math.random() * 20) + 's';
+                particle.style.animationDelay = (Math.random() * 15) + 's';
+                particle.style.background = `rgba(99, 102, 241, ${0.1 + Math.random() * 0.3})`;
+                container.appendChild(particle);
+            }
+        })();
+
+        // Set deploy time
+        document.getElementById('deployTime').textContent = new Date().toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Toast notification
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Animate progress bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const fills = document.querySelectorAll('.progress-bar .fill');
+            fills.forEach(function(fill) {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 300);
+            });
+        });
+
+        // Button click effects
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!this.classList.contains('btn-secondary') && !this.href) {
+                    e.preventDefault();
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(255,255,255,0.3);
+                        width: 100px;
+                        height: 100px;
+                        margin-top: -50px;
+                        margin-left: -50px;
+                        top: 50%;
+                        left: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s ease-out;
+                        pointer-events: none;
+                    `;
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+
+                    if (this.classList.contains('btn-primary')) {
+                        showToast();
+                    }
+                }
+            });
+        });
+
+        // Add ripple keyframes dynamically
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    </script>
+
+</body>
+</html>
+EOF
